@@ -67,7 +67,7 @@ def df_from_csv(path_and_file: str):
     '''
 
     # Setting up the dataframe for ingestion
-    data: pd = pd.read_csv(MAIN_FOLDER / path_and_file, encoding = 'UTF-8')
+    data: pd = pd.read_csv(MAIN_FOLDER / path_and_file, sep = '\t', encoding = 'UTF-8')
 
     # Returns the dataframe
     return data

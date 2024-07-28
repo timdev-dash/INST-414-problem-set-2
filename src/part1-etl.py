@@ -33,7 +33,7 @@ def etl():
     arrest_events_raw.drop(columns=['filing_date'], inplace=True)
 
     # Save both data frames to `data/` -> 'pred_universe_raw.csv', 'arrest_events_raw.csv'
-    pred_file_name: str = 'pred_univers_raw.csv'
+    pred_file_name: str = 'pred_universe_raw.csv'
     arrest_file_name: str = 'arrest_events_raw.csv'
     
     csv_from_df(pred_universe_raw, DATA_PATH + pred_file_name)
