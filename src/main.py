@@ -3,11 +3,11 @@ You will run this problem set from main.py, so set things up accordingly
 '''
 
 import pandas as pd
-from etl import etl
-from preprocessing import preprocess
-import logistic_regression
-import decision_tree
-import calibration_plot
+from part1_etl import etl
+from part2_preprocessing import preprocess
+from part3_logistic_regression import regression
+from part4_decision_tree import decision
+from part5_calibration_plot import calibration
 
 
 # Call functions / instanciate objects from the .py files
@@ -18,7 +18,7 @@ def main():
     # PART 2: Call functions/instanciate objects from preprocessing
     preprocess()
     # PART 3: Call functions/instanciate objects from logistic_regression
-
+    regression()
     # PART 4: Call functions/instanciate objects from decision_tree
 
     # PART 5: Call functions/instanciate objects from calibration_plot
