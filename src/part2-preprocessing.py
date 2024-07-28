@@ -1,19 +1,19 @@
 '''
 PART 2: Pre-processing
-- Take the time to understand the data before proceeding
-- Load `pred_universe_raw.csv` into a dataframe and `arrest_events_raw.csv` into a dataframe
-- Perform a full outer join/merge on 'person_id' into a new dataframe called `df_arrests`
-- Create a column in `df_arrests` called `y` which equals 1 if the person was arrested for a felony crime in the 365 days after their arrest date in `df_arrests`. 
-- - So if a person was arrested on 2016-09-11, you would check to see if there was a felony arrest for that person between 2016-09-12 and 2017-09-11.
-- - Use a print statment to print this question and its answer: What share of arrestees in the `df_arrests` table were rearrested for a felony crime in the next year?
-- Create a predictive feature for `df_arrests` that is called `current_charge_felony` which will equal one if the current arrest was for a felony charge, and 0 otherwise. 
-- - Use a print statment to print this question and its answer: What share of current charges are felonies?
-- Create a predictive feature for `df_arrests` that is called `num_fel_arrests_last_year` which is the total number arrests in the one year prior to the current charge. 
-- - So if someone was arrested on 2016-09-11, then you would check to see if there was a felony arrest for that person between 2015-09-11 and 2016-09-10.
-- - Use a print statment to print this question and its answer: What is the average number of felony arrests in the last year?
+x Take the time to understand the data before proceeding
+x Load `pred_universe_raw.csv` into a dataframe and `arrest_events_raw.csv` into a dataframe
+x Perform a full outer join/merge on 'person_id' into a new dataframe called `df_arrests`
+x Create a column in `df_arrests` called `y` which equals 1 if the person was arrested for a felony crime in the 365 days after their arrest date in `df_arrests`. 
+x - So if a person was arrested on 2016-09-11, you would check to see if there was a felony arrest for that person between 2016-09-12 and 2017-09-11.
+x - Use a print statment to print this question and its answer: What share of arrestees in the `df_arrests` table were rearrested for a felony crime in the next year?
+x Create a predictive feature for `df_arrests` that is called `current_charge_felony` which will equal one if the current arrest was for a felony charge, and 0 otherwise. 
+x - Use a print statment to print this question and its answer: What share of current charges are felonies?
+x Create a predictive feature for `df_arrests` that is called `num_fel_arrests_last_year` which is the total number arrests in the one year prior to the current charge. 
+x - So if someone was arrested on 2016-09-11, then you would check to see if there was a felony arrest for that person between 2015-09-11 and 2016-09-10.
+x - Use a print statment to print this question and its answer: What is the average number of felony arrests in the last year?
 - Print the mean of 'num_fel_arrests_last_year' -> pred_universe['num_fel_arrests_last_year'].mean()
 - Print pred_universe.head()
-- Return `df_arrests` for use in main.py for PART 3; if you can't figure this out, save as a .csv in `data/` and read into PART 3 in main.py
+x Return `df_arrests` for use in main.py for PART 3; if you can't figure this out, save as a .csv in `data/` and read into PART 3 in main.py
 '''
 
 # Standard library imports
@@ -29,7 +29,8 @@ from file_manager import df_from_csv, csv_from_df
 # Setting constants
 MAIN_FOLDER: Path = Path(__file__).absolute().parent
 DATA_PATH: str = '../data/'
-FINAL_FILE: str = 'preprocessed.csv'
+FINAL_ARRESTS_FILE: str = 'preprocessed.csv'#'preprocessed_arrests.csv'
+FINAL_PRED_FILE: str = 'preprocessed_pred_universe.csv'
 
 # Fuction to complete preprocessing
 def preprocess():
@@ -142,7 +143,7 @@ def preprocess():
         arrestee += 1
         
     # Saving the final dataframe for future stages
-    csv_from_df(df_arrests, DATA_PATH + FINAL_FILE)
+    csv_from_df(df_arrests, DATA_PATH + FINAL_ARRESTS_FILE)
 
     # Runs analysis function for dataset to provide requested answers
     analysis()
@@ -202,7 +203,9 @@ def analysis():
     '''
 
     # Brings in the preprocessed data set
-    preprocessed_df:pd = df_from_csv(DATA_PATH + FINAL_FILE)
+    preprocessed_df:pd = df_from_csv(DATA_PATH + FINAL_ARRESTS_FILE)
+    pred_universe_file_name: str = 'pred_universe_raw.csv'
+    pred_universe_df: pd = df_from_csv(DATA_PATH + pred_universe_file_name)
 
     # Determine and print the number of arrestees that were arrested for a felony within a year of their current arrest
     felony_rearrests: int = preprocessed_df.y.sum()
@@ -218,10 +221,15 @@ def analysis():
     avg_felonies_last_year: float = num_felony_last_year / num_of_arrests
     print('The average number of felony arrests last year is', avg_felonies_last_year)
 
+    # Determine mean of num_fel_arrests_last_year and add to pred_universe_df
+    mean_fel_arrests_last_year: float = preprocessed_df.num_fel_arrests_last_year.mean()
+    print(mean_fel_arrests_last_year)
+    #print(pred_universe_df.head())
+
 # Script run control
 if __name__ == "__main__":
-    preprocess()
-
+    #preprocess()
+    analysis()
 
 
 
