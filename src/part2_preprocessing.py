@@ -216,15 +216,11 @@ def analysis():
     print(felony_charges, 'of all current charges are for felonies.')
 
     # Determine and print the average of num_fel_arrests_last_year
-    num_felony_last_year: int = preprocessed_df.num_fel_arrests_last_year.sum()
-    num_of_arrests: int = preprocessed_df.shape[0]
-    avg_felonies_last_year: float = num_felony_last_year / num_of_arrests
-    print('The average number of felony arrests last year is', avg_felonies_last_year)
-
-    # Determine mean of num_fel_arrests_last_year and add to pred_universe_df
     mean_fel_arrests_last_year: float = preprocessed_df.num_fel_arrests_last_year.mean()
-    print(mean_fel_arrests_last_year)
-    #print(pred_universe_df.head())
+    print('The average number of felony arrests last year is', mean_fel_arrests_last_year)
+
+    # Print head of the preprocessed dataframe
+    print(preprocessed_df.head())
 
 # Script run control
 if __name__ == "__main__":
