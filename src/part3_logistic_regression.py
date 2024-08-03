@@ -7,8 +7,8 @@ x Create a parameter grid called `param_grid` containing three values for the C 
 x Initialize the Logistic Regression model with a variable called `lr_model` 
 x Initialize the GridSearchCV using the logistic regression model you initialized and parameter grid you created. Do 5 fold crossvalidation. Assign this to a variable called `gs_cv` 
 x Run the model 
-- What was the optimal value for C? Did it have the most or least regularization? Or in the middle? Print these questions and your answers. 
-- Now predict for the test set. Name this column `pred_lr`
+x What was the optimal value for C? Did it have the most or least regularization? Or in the middle? Print these questions and your answers. 
+x Now predict for the test set. Name this column `pred_lr`
 - Return dataframe(s) for use in main.py for PART 4 and PART 5; if you can't figure this out, save as .csv('s) in `data/` and read into PART 4 and PART 5 in main.py
 '''
 
@@ -56,8 +56,34 @@ def regression():
 
     # Run the model
     model = gs_cv.fit(df_arrests_train, subs_felony_train)
-    print(sorted(model.best_params_))
 
+    # Assing best_C
+    best_C: float = model.best_params_['C']
+    best_C_index: int = param_grid['C'].index(best_C)
+
+    # What is the optimal value for C?
+    print(best_C, 'is the best value for the hyperparameter "C".')
+
+    # Regualarization of C
+    if best_C_index == 0:
+        print('The best "C" of', best_C, 'had the least regularization of all options.')
+    elif best_C_index == len(param_grid['C']):
+        print('The best "C" of', best_C, 'had the most regularization of all options.')
+    else:
+        print('The best "C" of', best_C, 'was in the middle of regularization of all options.')
+        
+    # Predict the test set
+    df_arrests_test['pred_lr'] = gs_cv.predict(df_arrests_test)
+
+    # Save dataframes
+    arrests_train_file: str = 'arrests_train.csv'
+    arrests_test_file: str = 'arrests_test.csv'
+    subs_fel_train_file: str = 'subsequent_train.csv'
+    subs_fel_test_file: str = 'subsquent_test.csv'
+    csv_from_df(df_arrests_train, DATA_PATH + arrests_train_file)
+    csv_from_df(df_arrests_test, DATA_PATH + arrests_test_file)
+    csv_from_df(subs_felony_train, DATA_PATH + subs_fel_train_file)
+    csv_from_df(subs_felony_test, DATA_PATH + subs_fel_test_file)
 
 
 
