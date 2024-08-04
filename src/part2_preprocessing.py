@@ -19,6 +19,7 @@ x Return `df_arrests` for use in main.py for PART 3; if you can't figure this ou
 # Standard library imports
 from pathlib import Path
 import re
+from datetime import date
 
 # Third party imports
 import pandas as pd
@@ -33,13 +34,17 @@ FINAL_ARRESTS_FILE: str = 'preprocessed.csv'#'preprocessed_arrests.csv'
 FINAL_PRED_FILE: str = 'preprocessed_pred_universe.csv'
 
 # Fuction to complete preprocessing
-def preprocess():
+def preprocess(pred_universe_df: pd, arrest_events_df: pd):
     '''
     Preprocessing function to perform assigned tasks
+
+    Parameters
+    pred_universe_df(Dataframe): Downloaded raw pred_universe data
+    arrest_events_df(Dataframe): Downloaded raw arrest_events data
+
+    Returns
+    df_arrests(Dataframe): Merged and processed dataframe of arrest data
     '''
-    # Pulling in the targeted dataframes for pre-processing
-    pred_universe_df = preload('pred_universe_raw.csv')
-    arrest_events_df = preload('arrest_events_raw.csv')
 
     # Joining the dataframes to create df_arrests for further evaluation
     df_arrests:pd = prejoin(arrest_events_df, pred_universe_df, 'person_id')
@@ -71,14 +76,21 @@ def preprocess():
         # Pulling arrestee details for comparison
         arrestee_id: int = df_arrests.loc[arrestee, 'person_id']
         arrestee_charge: str = df_arrests.loc[arrestee, 'charge_degree']
-        
+
         # Converting the arrest date to a date object
-        arrestee_year: int = int(re.findall(r'[\d]{4}(?=-)', df_arrests.loc[arrestee,'arrest_date_event'])[0])
-        arrestee_month: int = int(re.findall(r'(?<=-)[\d]*(?=-[\d])', df_arrests.loc[arrestee,'arrest_date_event'])[0])
-        arrestee_day: int = int(re.findall(r'(?<=-[\d]{2}-)[\d]{2}', df_arrests.loc[arrestee,'arrest_date_event'])[0])
-        arrestee_date: int = (arrestee_year * 10000) + (arrestee_month * 100) + arrestee_day
-        arrestee_plus_year: int = ((arrestee_year + 1) * 10000) + (arrestee_month * 100) + arrestee_day
-        arrestee_minus_year: int = ((arrestee_year - 1) * 10000) + (arrestee_month * 100) + arrestee_day
+        # arrestee_year: int = int(re.findall(r'[\d]{4}(?=-)', df_arrests.loc[arrestee,'arrest_date_event'])[0])
+        # arrestee_month: int = int(re.findall(r'(?<=-)[\d]*(?=-[\d])', df_arrests.loc[arrestee,'arrest_date_event'])[0])
+        # arrestee_day: int = int(re.findall(r'(?<=-[\d]{2}-)[\d]{2}', df_arrests.loc[arrestee,'arrest_date_event'])[0])
+        arrestee_date: date = df_arrests.loc[arrestee,'arrest_date_event']
+        print(arrestee_date.day, arrestee_date.month)
+    
+        # Logic to figure out leap years
+        if arrestee_date.day == 29 and arrestee_date.month == 2:
+            arrestee_plus_year: date = arrestee_date.replace(year = (arrestee_date.year + 1), day = (arrestee_date.day - 1))
+            arrestee_minus_year: date = arrestee_date.replace(year = (arrestee_date.year - 1), day = (arrestee_date.day - 1))
+        else:
+            arrestee_plus_year: date = arrestee_date.replace(year = (arrestee_date.year + 1))
+            arrestee_minus_year: date = arrestee_date.replace(year = (arrestee_date.year - 1))
 
         # Setting up a while loop to compare future arrests
         arrest_compare_number: int = 0
@@ -90,10 +102,10 @@ def preprocess():
             arrest_compare_degree: str = df_arrests.loc[arrest_compare_number, 'charge_degree']
 
             # Converting the arrest comparison date to a date object
-            arrest_compare_year: int = int(re.findall(r'[\d]{4}(?=-)', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
-            arrest_compare_month: int = int(re.findall(r'(?<=-)[\d]*(?=-[\d])', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
-            arrest_compare_day: int = int(re.findall(r'(?<=-[\d]{2}-)[\d]{2}', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
-            arrest_compare_date: int = (arrest_compare_year * 10000) + (arrest_compare_month * 100) + arrest_compare_day
+            # arrest_compare_year: int = int(re.findall(r'[\d]{4}(?=-)', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
+            # arrest_compare_month: int = int(re.findall(r'(?<=-)[\d]*(?=-[\d])', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
+            # arrest_compare_day: int = int(re.findall(r'(?<=-[\d]{2}-)[\d]{2}', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
+            arrest_compare_date: date = df_arrests.loc[arrest_compare_number,'arrest_date_event']
             
             # Running logic to see if the comparison arrest is:
             # 1. For the same arrestee
@@ -141,12 +153,12 @@ def preprocess():
 
         # Iterate the loop to continue
         arrestee += 1
-        
-    # Saving the final dataframe for future stages
-    csv_from_df(df_arrests, DATA_PATH + FINAL_ARRESTS_FILE)
 
     # Runs analysis function for dataset to provide requested answers
-    analysis()
+    analysis(df_arrests)
+
+    # Returns the df_arrests dataframe
+    return df_arrests
 
 # Loading of the files and creating the dataframes for additional processing
 def preload(file_name: str):
@@ -187,7 +199,7 @@ def prejoin(df1: pd, df2: pd, merge_key: str):
     return joined_dataframe
 
 # Performing anaylsis of preprocessed data
-def analysis():
+def analysis(preprocessed_df: pd):
     '''
     This function performs analysis on the preproccesed data and provides print statments regarding the results
     - Create a column in `df_arrests` called `y` which equals 1 if the person was arrested for a felony crime in the 365 days after their arrest date in `df_arrests`. 
@@ -200,12 +212,11 @@ def analysis():
     - - Use a print statment to print this question and its answer: What is the average number of felony arrests in the last year?
     - Print the mean of 'num_fel_arrests_last_year' -> pred_universe['num_fel_arrests_last_year'].mean()
     - Print pred_universe.head()
-    '''
 
-    # Brings in the preprocessed data set
-    preprocessed_df:pd = df_from_csv(DATA_PATH + FINAL_ARRESTS_FILE)
-    pred_universe_file_name: str = 'pred_universe_raw.csv'
-    pred_universe_df: pd = df_from_csv(DATA_PATH + pred_universe_file_name)
+    Parameters
+    preprocessed_df(Dataframe): Preprocessed dataframe from preprocess function
+
+    '''
 
     # Determine and print the number of arrestees that were arrested for a felony within a year of their current arrest
     felony_rearrests: int = preprocessed_df.y.sum()
@@ -225,7 +236,8 @@ def analysis():
 # Script run control
 if __name__ == "__main__":
     #preprocess()
-    analysis()
+    #analysis()
+    pass
 
 
 

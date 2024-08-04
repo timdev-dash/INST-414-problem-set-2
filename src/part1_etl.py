@@ -20,6 +20,10 @@ DATA_PATH: str = '../data/'
 def etl():
     '''
     etl function performs the extract, transform, and load work necessary to proceed through the problem
+
+    Returns
+    pred_universe_raw(Dataframe): Pred Universe dataframe
+    arrest_events_raw(Dataframe): Arrest Events dataframe
     '''
 
     # Extract dataframes from the provided data sources
@@ -39,6 +43,7 @@ def etl():
     csv_from_df(pred_universe_raw, DATA_PATH + pred_file_name)
     csv_from_df(arrest_events_raw, DATA_PATH + arrest_file_name)
 
+    return pred_universe_raw, arrest_events_raw
 
 # Script run control
 if __name__ == "__main__":
