@@ -17,21 +17,10 @@ x Return `df_arrests` for use in main.py for PART 3; if you can't figure this ou
 '''
 
 # Standard library imports
-from pathlib import Path
-import re
 from datetime import date
 
 # Third party imports
 import pandas as pd
-
-# Local application imports
-from file_manager import df_from_csv, csv_from_df
-
-# Setting constants
-MAIN_FOLDER: Path = Path(__file__).absolute().parent
-DATA_PATH: str = '../data/'
-FINAL_ARRESTS_FILE: str = 'preprocessed.csv'#'preprocessed_arrests.csv'
-FINAL_PRED_FILE: str = 'preprocessed_pred_universe.csv'
 
 # Fuction to complete preprocessing
 def preprocess(pred_universe_df: pd, arrest_events_df: pd):
@@ -76,13 +65,7 @@ def preprocess(pred_universe_df: pd, arrest_events_df: pd):
         # Pulling arrestee details for comparison
         arrestee_id: int = df_arrests.loc[arrestee, 'person_id']
         arrestee_charge: str = df_arrests.loc[arrestee, 'charge_degree']
-
-        # Converting the arrest date to a date object
-        # arrestee_year: int = int(re.findall(r'[\d]{4}(?=-)', df_arrests.loc[arrestee,'arrest_date_event'])[0])
-        # arrestee_month: int = int(re.findall(r'(?<=-)[\d]*(?=-[\d])', df_arrests.loc[arrestee,'arrest_date_event'])[0])
-        # arrestee_day: int = int(re.findall(r'(?<=-[\d]{2}-)[\d]{2}', df_arrests.loc[arrestee,'arrest_date_event'])[0])
         arrestee_date: date = df_arrests.loc[arrestee,'arrest_date_event']
-        print(arrestee_date.day, arrestee_date.month)
     
         # Logic to figure out leap years
         if arrestee_date.day == 29 and arrestee_date.month == 2:
@@ -100,11 +83,6 @@ def preprocess(pred_universe_df: pd, arrest_events_df: pd):
             # Pulling comparison data
             arrest_compare_id: int = df_arrests.loc[arrest_compare_number, 'person_id']
             arrest_compare_degree: str = df_arrests.loc[arrest_compare_number, 'charge_degree']
-
-            # Converting the arrest comparison date to a date object
-            # arrest_compare_year: int = int(re.findall(r'[\d]{4}(?=-)', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
-            # arrest_compare_month: int = int(re.findall(r'(?<=-)[\d]*(?=-[\d])', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
-            # arrest_compare_day: int = int(re.findall(r'(?<=-[\d]{2}-)[\d]{2}', df_arrests.loc[arrest_compare_number,'arrest_date_event'])[0])
             arrest_compare_date: date = df_arrests.loc[arrest_compare_number,'arrest_date_event']
             
             # Running logic to see if the comparison arrest is:
@@ -159,23 +137,6 @@ def preprocess(pred_universe_df: pd, arrest_events_df: pd):
 
     # Returns the df_arrests dataframe
     return df_arrests
-
-# Loading of the files and creating the dataframes for additional processing
-def preload(file_name: str):
-    '''
-    This function loads the pred_universe and arrest_events csv files into dataframes for
-    additional pre-processing
-
-    Parameter:
-        file_name(string): The name of the file to be opened
-
-    Returns:
-        new_dataframe(pandas): The loaded dataframe
-    '''
-
-    new_dataframe: pd = df_from_csv(DATA_PATH + file_name)
-
-    return new_dataframe
 
 # Joining the two dataframes into a new dataframe
 def prejoin(df1: pd, df2: pd, merge_key: str):

@@ -10,22 +10,10 @@ x Now predict for the test set. Name this column `pred_dt`
 x Return dataframe(s) for use in main.py for PART 5; if you can't figure this out, save as .csv('s) in `data/` and read into PART 5 in main.py
 '''
 
-# Standard library imports
-from pathlib import Path 
-
 # Third party imports
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.model_selection import StratifiedKFold as KFold_strat
 from sklearn.tree import DecisionTreeClassifier as DTC
-
-# Local application imports
-from file_manager import df_from_csv, csv_from_df
-
-# Setting constants
-MAIN_FOLDER: Path = Path(__file__).absolute().parent
-DATA_PATH: str = '../data/'
 
 # Fuction to complete decision tree
 def decision_tree(df_arrests_train: pd, df_arrests_test: pd, subs_felony_train: pd):

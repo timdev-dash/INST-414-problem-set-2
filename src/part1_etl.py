@@ -2,18 +2,8 @@
 PART 1: ETL the two datasets and save each in `data/` as .csv's
 '''
 
-# Standard library imports
-from pathlib import Path
-
 # Third party imports
 import pandas as pd
-
-# Local application imports
-from file_manager import csv_from_df
-
-# Setting constants
-MAIN_FOLDER: Path = Path(__file__).absolute().parent
-DATA_PATH: str = '../data/'
 
 # The etl function will extract the data from the url's, transform the data with the provided
 # instructions, and load the data into csv files in the ./data folder
@@ -35,13 +25,6 @@ def etl():
     arrest_events_raw['arrest_date_event'] = pd.to_datetime(arrest_events_raw.filing_date)
     pred_universe_raw.drop(columns=['filing_date'], inplace=True)
     arrest_events_raw.drop(columns=['filing_date'], inplace=True)
-
-    # Save both data frames to `data/` -> 'pred_universe_raw.csv', 'arrest_events_raw.csv'
-    pred_file_name: str = 'pred_universe_raw.csv'
-    arrest_file_name: str = 'arrest_events_raw.csv'
-    
-    csv_from_df(pred_universe_raw, DATA_PATH + pred_file_name)
-    csv_from_df(arrest_events_raw, DATA_PATH + arrest_file_name)
 
     return pred_universe_raw, arrest_events_raw
 
